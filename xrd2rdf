@@ -1,0 +1,51 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+input_file='/Users/lanjinggang/Desktop/mp2_water/vib_ex/Delta_RDF.txt'
+fontsize=24
+
+with open(input_file, 'r') as f:
+    header = f.readline().strip().split()[1:]
+# Define the parameters of the X-ray experiment
+wavelength = 0.15418 # Angstroms
+theta = np.arange(0.1, 100, 0.1) # scattering angle in degrees
+
+# Load the X-ray scattering data
+data = np.loadtxt(input_file)
+k,f_k = data[:,0],data[:,1:-1]
+# Convert the X-ray scattering to radial distribution
+r = np.arange(0.01, 10, 0.01) # radial distance in Angstroms
+
+g_r = np.zeros([len(r),np.shape(data[:,1:-1])[1]])
+print(np.shape(g_r))
+
+for j in range(np.shape(data[:,1:-1])[1]):
+    for i in range(len(r)):
+        g_r[i,j] = np.trapz(f_k[:,j] * k * np.sin(k * r[i]) / (k * r[i]), k)
+        
+# Normalize the radial distribution
+factor=np.repeat(r,np.shape(data[:,1:-1])[1]).reshape(np.shape(g_r))
+
+r_min = 2 * np.pi / np.max(k)
+
+g_r = 4 * np.pi * factor**2 * g_r / r_min
+
+# Plot the results
+label=header
+
+cmap = plt.cm.get_cmap('Blues')
+
+# generate a sequential color array
+color = cmap(np.linspace(1, 0.4, np.shape(data[:,1:-1])[1]))
+
+plt.figure(figsize=(12,12))
+for j in range(len(f_k[0])):
+    plt.plot(r, g_r[:,j], label=label[j],linewidth=3,color=color[j])
+plt.xlabel('r (Å)',fontsize=fontsize)
+plt.ylabel('$\Delta$PDF',fontsize=fontsize)
+plt.xticks(fontsize=fontsize)
+plt.yticks(fontsize=fontsize)
+plt.legend(frameon=False,fontsize=fontsize/1.5)
+plt.xlim([0,8])
+plt.show()
+
