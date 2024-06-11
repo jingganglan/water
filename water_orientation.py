@@ -1,6 +1,10 @@
 import numpy as np
 import MDAnalysis as mda
 from MDAnalysis.analysis import distances
+from matplotlib.image import NonUniformImage
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
 
 def load_traj(traj):
     cell = [14.240302648, 16.443320454, 50.0, 90, 90, 90]
